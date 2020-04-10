@@ -1,6 +1,7 @@
 import os
 import unittest
 import tempfile
+import json
 
 import app
 
@@ -47,7 +48,7 @@ class FlaskrTestCase(unittest.TestCase):
     def test_empty_db(self):
         """Ensure database is blank"""
         rv = self.app.get('/')
-        assert b'No entries here so far' in rv.data
+        assert b'No entries yet. Add some!' in rv.data
 
     def test_login_logout(self):
         """Test login and logout using helper functions."""
@@ -69,21 +70,26 @@ class FlaskrTestCase(unittest.TestCase):
         )
         assert b'Invalid password' in rv.data
 
+    def test_messages(self):
+        """Ensure that a user can post messages."""
+        self.login(
+            app.app.config['USERNAME'],
+            app.app.config['PASSWORD']
+        )
 
-def test_messages(self):
-    """Ensure that a user can post messages."""
-    self.login(
-        app.app.config['USERNAME'],
-        app.app.config['PASSWORD']
-    )
+        rv = self.app.post('/add', data=dict(
+            title='<Hello>',
+            text='<strong>HTML</strong> allowed here'
+        ), follow_redirects=True)
+        assert b'No entries here so far' not in rv.data
+        assert b'&lt;Hello&gt;' in rv.data
+        assert b'<strong>HTML</strong> allowed here' in rv.data
 
-    rv = self.app.post('/add', data=dict(
-        title='<Hello>',
-        text='<strong>HTML</strong> allowed here'
-    ), follow_redirects=True)
-    assert b'No entries here so far' not in rv.data
-    assert b'&lt;Hello&gt;' in rv.data
-    assert b'<strong>HTML</strong> allowed here' in rv.data
+    def test_delete_message(self):
+        """Ensure the messages are being deleted."""
+        rv = self.app.get('/delete/1')
+        data = json.loads(rv.data.decode('utf-8'))
+        self.assertEqual(data['status'], 1)
 
 
 if __name__ == '__main__':

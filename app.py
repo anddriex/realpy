@@ -96,6 +96,27 @@ def add_entry():
     return redirect(url_for('index'))
 
 
+@app.route('/delete/<post_id>', methods=['GET'])
+def delete_entry(post_id):
+    """Delete a post from database"""
+    result = {'status': 0, 'message': 'Error'}
+    try:
+        db = get_db()
+        db.execute('delete from entries where id=' + post_id)
+        db.commit()
+        result = {'status': 1, 'message': "Post Deleted"}
+    except Exception as e:
+        result = {'status': 0, 'message': repr(e)}
+
+    return jsonify(result)
+
+
+@app.route('/edit', methods=['PUT'])
+def edit_entry(message_id):
+    """Edit a post from the database"""
+    pass
+
+
 if __name__ == '__main__':
     init_db()
     app.run()
