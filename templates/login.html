@@ -2,22 +2,16 @@
 <html>
 <head>
     <title>Kcha Flaskr-TDD | Login</title>
-    <link rel="stylesheet" type="text/css" href="{{ url_for('static', filename='style.css')}}">
+    <link rel="stylesheet" type="text/css" href="https://stackpath.bootstrapcdn.com/bootstrap/4.3.1/css/bootstrap.min.css">
 </head>
 <body>
-    <div class="page">
+    <div class="container">
+        <br><br>
         <h1>Kcha crud</h1>
-
-        <div class="metanav">
-            {% if not session.logged_in %}
-             <a href="{{ url_for('login') }}">log in</a>
-            {% else %}
-             <a href="{{ url_for('logout') }}">log out</a>
-            {% endif %}
-        </div>
+        <br><br>
 
         {% for message in get_flashed_messages() %}
-         <div class="flash">{{ message }}</div>
+         <div class="flash alert alert-success col-sm-4" role="success">{{ message }}</div>
         {% endfor %}
 
         {% block body %}{% endblock %}
@@ -25,18 +19,21 @@
         <h2>login</h2>
 
         {% if error %}
-         <p class="error"><strong>Error:</strong> {{ error }}</p>
+         <p class="alert alert-danger col-sm-4" role="danger"><strong>Error:</strong> {{ error }}</p>
         {% endif %}
 
-        <form action="{{ url_for('login') }}" method="post">
+        <form action="{{ url_for('login') }}" method="post" class="form-group">
             <dl>
                 <dt>Username:</dt>
-                <dd><input type="text" name="username"></dd>
+                <dd><input type="text" name="username" class="form-control col-sm-4"></dd>
                 <dt>Password:</dt>
-                <dd><input type="password" name="password"></dd>
-                <dd><input type="submit" value="login"></dd>
+                <dd><input type="password" name="password" class="form-control col-sm-4"></dd>
+                <br><br>
+                <dd><input type="submit" class="btn btn-primary" value="login"></dd>
+                <span>Use "admin" for username and password</span>
             </dl>
         </form>
     </div>
+    <script type="text/javascript" src="{{ url_for('static', filename='main.js') }}"></script>
 </body>
 </html>
