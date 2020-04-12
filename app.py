@@ -1,9 +1,11 @@
 # imports
 import os
 
+from random import randint
 from flask import (Flask, request, session, g, redirect, url_for,
                    abort, render_template, flash, jsonify)
 from flask_sqlalchemy import SQLAlchemy
+from sendgrid import send_verification_email
 
 # get the folder where this file runs
 basedir = os.path.abspath(os.path.dirname(__file__))
@@ -14,7 +16,7 @@ DEBUG = True
 SECRET_KEY = 'my_precious'
 USERNAME = 'admin'
 PASSWORD = 'admin'
-
+VERIFICATION_CODE = '1234'
 # define the full path for the database
 DATABASE_PATH = os.path.join(basedir, DATABASE)
 
@@ -28,6 +30,10 @@ app.config.from_object(__name__)
 db = SQLAlchemy(app)
 
 import models
+
+
+def build_code():
+    return ''.join([str(randint(0, 9)) for i in range(4)])
 
 
 @app.route('/')
@@ -47,10 +53,27 @@ def login():
         elif request.form['password'] != app.config['PASSWORD']:
             error = 'Invalid password'
         else:
+            code = app.config['VERIFICATION_CODE'] if app.config['TESTING'] else build_code()
+            send_verification_email(app.config['USERNAME'], code)
+            session['verification_code'] = code
+            flash('Te hemos enviado el código de verificación a tu correo')
+            return redirect(url_for('verify'))
+
+    return render_template('login.html', error=error)
+
+
+@app.route('/verify', methods=['GET', 'POST'])
+def verify():
+    """User verify account with code sent via email"""
+    error = None
+    if request.method == 'POST':
+        if request.form['verification_code'] != session.get('verification_code'):
+            error = 'Incorrect verification code entered'
+        else:
             session['logged_in'] = True
             flash('You were logged in')
             return redirect(url_for('index'))
-    return render_template('login.html', error=error)
+    return render_template('verify.html', error=error)
 
 
 @app.route('/logout')

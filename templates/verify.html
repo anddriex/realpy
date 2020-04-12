@@ -1,0 +1,35 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <title>Kacha | Verificar</title>
+    <link rel="stylesheet" type="text/css" href="https://stackpath.bootstrapcdn.com/bootstrap/4.3.1/css/bootstrap.min.css">
+</head>
+<body>
+    <div class="container">
+        <br><br>
+        <h1>Kcha crud</h1>
+        <br><br>
+
+        {% for message in get_flashed_messages() %}
+         <div class="flash alert alert-success col-sm-4" role="success">{{ message }}</div>
+        {% endfor %}
+
+        {% block body %}{% endblock %}
+
+        <h2>Verify</h2>
+
+        {% if error %}
+         <p class="alert alert-danger col-sm-4" role="danger"><strong>Error:</strong> {{ error }}</p>
+        {% endif %}
+
+        <form action="{{ url_for('verify') }}" method="post" class="form-group">
+            <dl>
+                <dt>Insertar código de verificación:</dt>
+                <dd><input type="text" name="verification_code" class="form-control col-sm-4"></dd>
+                <br><br>
+                <dd><input type="submit" class="btn btn-primary" value="login"></dd>
+            </dl>
+        </form>
+    </div>
+</body>
+</html>

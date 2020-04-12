@@ -2,9 +2,11 @@ import os
 import unittest
 import json
 
-from app import app, db
+from unittest.mock import patch
+from app import app, db, build_code
 
 TEST_DB = 'test.db'
+
 
 class BasicTestCase(unittest.TestCase):
 
@@ -34,12 +36,16 @@ class FlaskrTestCase(unittest.TestCase):
         """Destroy blank temp database after each test."""
         db.drop_all()
 
-    def login(self, username, password):
+    @patch('app.send_verification_email', return_value='doom')
+    def successfully_login(self, username, password, code, *_):
         """Login helper function."""
-        return self.app.post('/login', data=dict(
+        self.app.post('/login', data=dict(
             username=username,
-            password=password
-        ), follow_redirects=True)
+            password=password))
+        return self.app.post(
+            '/verify',
+            data=dict(verification_code=code),
+            follow_redirects=True)
 
     def logout(self):
         """Logout helper function"""
@@ -52,20 +58,49 @@ class FlaskrTestCase(unittest.TestCase):
         rv = self.app.get('/')
         self.assertIn(b'No entries yet. Add some!', rv.data)
 
+    @patch('app.send_verification_email')
+    def test_login_step(self, mock_send_email):
+        """Test the first login step"""
+        rv = self.app.post('/login', data=dict(
+            username=app.config['USERNAME'],
+            password=app.config['PASSWORD']
+        ), follow_redirects=True)
+        self.assertIn(b'Te hemos enviado el c\xc3\xb3digo de verificaci\xc3\xb3n a tu correo', rv.data)
+        mock_send_email.assert_called_once_with(app.config['USERNAME'], app.config['VERIFICATION_CODE'])
+
+    def test_verify_incorrect_code(self):
+        """Test verify_user returns error when incorrect code inserted."""
+        rv = self.successfully_login(app.config['USERNAME'],
+                                     app.config['PASSWORD'],
+                                     app.config['VERIFICATION_CODE'] + 'x')
+        self.assertIn(b'Incorrect verification code entered', rv.data)
+
     def test_login_logout(self):
         """Test login and logout using helper functions."""
-        rv = self.login(app.config['USERNAME'], app.config['PASSWORD'])
+        rv = self.successfully_login(app.config['USERNAME'],
+                                     app.config['PASSWORD'],
+                                     app.config['VERIFICATION_CODE'])
         self.assertIn(b'You were logged in', rv.data)
+
         rv = self.logout()
         self.assertIn(b'You were logged out', rv.data)
-        rv = self.login(app.config['USERNAME'] + 'x', app.config['PASSWORD'])
+
+    def test_login_errors(self):
+        """Test login incorrect credentials"""
+        rv = self.app.post('/login', data=dict(
+            username=app.config['USERNAME'] + 'x',
+            password=app.config['PASSWORD']))
         self.assertIn(b'Invalid username', rv.data)
-        rv = self.login(app.config['USERNAME'], app.config['PASSWORD'] + 'x')
+        rv = self.app.post('/login', data=dict(
+            username=app.config['USERNAME'],
+            password=app.config['PASSWORD'] + 'x'))
         self.assertIn(b'Invalid password', rv.data)
 
     def test_messages(self):
         """Ensure that a user can post messages."""
-        self.login(app.config['USERNAME'], app.config['PASSWORD'])
+        self.successfully_login(app.config['USERNAME'],
+                                app.config['PASSWORD'],
+                                app.config['VERIFICATION_CODE'])
         rv = self.app.post('/add', data=dict(
             title='<Hello>',
             text='<strong>HTML</strong> allowed here'
@@ -79,6 +114,11 @@ class FlaskrTestCase(unittest.TestCase):
         rv = self.app.get('/delete/1')
         data = json.loads(rv.data)
         self.assertEqual(data['status'], 1)
+
+    def test_build_code(self):
+        code = build_code()
+        self.assertEqual(len(code), 4)
+        self.assertRegex(code, '[0-9]')
 
 
 if __name__ == '__main__':
