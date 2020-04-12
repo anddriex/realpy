@@ -1,12 +1,13 @@
 # imports
 import os
-
+from dotenv import load_dotenv
 from random import randint
 from flask import (Flask, request, session, g, redirect, url_for,
                    abort, render_template, flash, jsonify)
 from flask_sqlalchemy import SQLAlchemy
-from sendgrid import send_verification_email
+from email_service import send_verification_email
 
+load_dotenv()
 # get the folder where this file runs
 basedir = os.path.abspath(os.path.dirname(__file__))
 
@@ -14,8 +15,8 @@ basedir = os.path.abspath(os.path.dirname(__file__))
 DATABASE = 'flaskr.db'
 DEBUG = True
 SECRET_KEY = 'my_precious'
-USERNAME = 'admin'
-PASSWORD = 'admin'
+USERNAME = 'andres@tinkin.one'
+PASSWORD = 'hola'
 VERIFICATION_CODE = '1234'
 # define the full path for the database
 DATABASE_PATH = os.path.join(basedir, DATABASE)
