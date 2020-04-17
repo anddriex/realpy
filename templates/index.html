@@ -42,8 +42,8 @@
              <li class="entry">
                  <h2 id="{{ entry.post_id }}">{{ entry.title }}</h2>
                  {{ entry.text|safe }}
-                 <a href="{{ url_for('edit_entry') }}">Edit</a>
-                 <a href="{{ '/delete_entry/%s'%entry.post_id }}" methods="post">Delete</a>
+                 <a href="{{ '/edit/%s'%entry.post_id }}" methods="get">Editar</a>
+                 <a href="{{ '/delete/%s'%entry.post_id }}" methods="get">Borrar</a>
              </li>
             {% else %}
              <li><em>No entries yet. Add some!</em></li>

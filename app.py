@@ -57,7 +57,7 @@ def login():
 def logout():
     """User logout/authentication/session management"""
     session.pop('logged_in', None)
-    flash('You were logged out')
+    flash('Sesion cerrada exitosamente')
     return redirect(url_for('index'))
 
 
@@ -76,23 +76,39 @@ def add_entry():
 @app.route('/delete/<int:post_id>', methods=['GET'])
 def delete_entry(post_id):
     """Delete a post from database"""
-    result = {'status': 0, 'message': 'Error'}
     try:
         new_id = post_id
         db.session.query(models.Flaskr).filter_by(post_id=new_id).delete()
         db.session.commit()
-        result = {'status': 1, 'message': "Post Deleted"}
         flash('The entry was deleted.')
     except Exception as e:
-        result = {'status': 0, 'message': repr(e)}
+        flash('ERROR: ', e)
 
-    return jsonify(result)
+    return redirect(url_for('index'))
 
 
-@app.route('/edit', methods=['PUT'])
-def edit_entry(message_id):
+@app.route('/edit/<int:post_id>', methods=['GET', 'POST'])
+def edit_entry(post_id):
     """Edit a post from the database"""
-    pass
+    update_post = db.session.query(models.Flaskr).get({'post_id': post_id})
+    if request.method == 'POST':
+        try:
+            if not session.get('logged_in'):
+                abort(401)
+            db.session.query(models.Flaskr) \
+                .filter_by(post_id=post_id).update({'title': request.form['title'],
+                                                    'text': request.form['text']})
+            db.session.commit()
+            flash('Entrada actualizada!')
+        except Exception as e:
+            flash(e)
+
+        return redirect(url_for('index'))
+    if session.get('logged_in'):
+        flash('Editar post')
+    else:
+        flash('Registrate para editar')
+    return render_template('edit.html', update_post=update_post)
 
 
 if __name__ == '__main__':

@@ -1,0 +1,40 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <title>Kacha Flaskr TDD | Editar</title>
+    <link rel="stylesheet" type="text/css" href="https://stackpath.bootstrapcdn.com/bootstrap/4.3.1/css/bootstrap.min.css">
+</head>
+<body>
+<div class="container">
+    <br><br>
+    <h1>Kcha Flaskr-TDD | Edicion</h1>
+    <br><br>
+
+    {% if not session.logged_in %}
+    <a class="btn btn-success" role="button" href="{{ url_for('login') }}">log in</a>
+    {% else %}
+    <a class="btn btn-warning" role="button" href="{{ url_for('logout') }}">log out</a>
+    {% endif %}
+
+    <br><br>
+
+    {% for message in get_flashed_messages() %}
+    <div class="flash alert alert-success col-sm-4" role="success">{{ message }}</div>
+    {% endfor %}
+
+        {% if session.logged_in %}
+         <form action="{{ url_for('edit_entry', post_id=update_post.post_id)}}" method="post" class="add-entry form-group">
+            <dl>
+                <dt>Title: </dt>
+                <dd><input type="text" size="30" name="title" class="form-control col-sm-4" value="{{ update_post.title }}"></dd>
+                <dt>Text:</dt>
+                <dd><textarea name="text" rows="5" cols="40" class="form-control col-sm-4">{{ update_post.text }}</textarea></dd>
+                <br><br>
+                <dd><input type="submit" class="btn btn-primary" value="Guardar"></dd>
+            </dl>
+          </form>
+        {% endif %}
+     <br>
+    </div>
+</body>
+</html>
