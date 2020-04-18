@@ -58,23 +58,23 @@ class FlaskrTestCase(unittest.TestCase):
     def test_empty_db(self):
         """Ensure database is blank"""
         rv = self.app.get('/')
-        self.assertIn(b'No entries yet. Add some!', rv.data)
+        self.assertIn(b'No hay entradas. Agrega una ahora!', rv.data)
 
     def test_login_logout(self):
         """Test login and logout using helper functions."""
         rv = self.login(app.config['USERNAME'], app.config['PASSWORD'])
-        self.assertIn(b'You were logged in', rv.data)
+        self.assertIn(b'Has iniciado sesi\xc3\xb3n', rv.data)
         rv = self.logout()
-        self.assertIn(b'Sesion cerrada exitosamente', rv.data)
+        self.assertIn(b'Sesi\xc3\xb3n cerrada exitosamente', rv.data)
         rv = self.login(app.config['USERNAME'] + 'x', app.config['PASSWORD'])
-        self.assertIn(b'Invalid username', rv.data)
+        self.assertIn(b'Nombre de usuario invalida', rv.data)
         rv = self.login(app.config['USERNAME'], app.config['PASSWORD'] + 'x')
-        self.assertIn(b'Invalid password', rv.data)
+        self.assertIn(b'Password invalido', rv.data)
 
     def test_messages(self):
         """Ensure that a user can post messages."""
         rv = self.post_new_message(title_msg='<Hello>', text_msg='<strong>HTML</strong> allowed here')
-        self.assertNotIn(b'No entries yet. Add some!', rv.data)
+        self.assertNotIn(b'No hay entradas. Agrega una ahora!', rv.data)
         self.assertIn(b'&lt;Hello&gt;', rv.data)
         self.assertIn(b'<strong>HTML</strong> allowed here', rv.data)
 
@@ -95,7 +95,7 @@ class FlaskrTestCase(unittest.TestCase):
     def test_delete_message(self):
         """Ensure the messages are being deleted."""
         rv = self.app.get('/delete/1', follow_redirects=True)
-        self.assertIn(b'No entries yet. Add some!', rv.data)
+        self.assertIn(b'No hay entradas. Agrega una ahora!', rv.data)
 
 
 if __name__ == '__main__':

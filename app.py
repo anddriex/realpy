@@ -43,12 +43,12 @@ def login():
     error = None
     if request.method == 'POST':
         if request.form['username'] != app.config['USERNAME']:
-            error = 'Invalid username'
+            error = 'Nombre de usuario invalida'
         elif request.form['password'] != app.config['PASSWORD']:
-            error = 'Invalid password'
+            error = 'Password invalido'
         else:
             session['logged_in'] = True
-            flash('You were logged in')
+            flash('Has iniciado sesión')
             return redirect(url_for('index'))
     return render_template('login.html', error=error)
 
@@ -57,7 +57,7 @@ def login():
 def logout():
     """User logout/authentication/session management"""
     session.pop('logged_in', None)
-    flash('Sesion cerrada exitosamente')
+    flash('Sesión cerrada exitosamente')
     return redirect(url_for('index'))
 
 
@@ -69,7 +69,7 @@ def add_entry():
     new_entry = models.Flaskr(request.form['title'], request.form['text'])
     db.session.add(new_entry)
     db.session.commit()
-    flash('New entry was successfully posted')
+    flash('Nueva entrada posteada!')
     return redirect(url_for('index'))
 
 
@@ -80,7 +80,7 @@ def delete_entry(post_id):
         new_id = post_id
         db.session.query(models.Flaskr).filter_by(post_id=new_id).delete()
         db.session.commit()
-        flash('The entry was deleted.')
+        flash('La entrada fue eliminada')
     except Exception as e:
         flash('ERROR: ', e)
 
@@ -107,7 +107,7 @@ def edit_entry(post_id):
     if session.get('logged_in'):
         flash('Editar post')
     else:
-        flash('Registrate para editar')
+        flash('Inicia sesión para editar')
     return render_template('edit.html', update_post=update_post)
 
 

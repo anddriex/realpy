@@ -7,7 +7,7 @@
 <body>
     <div class="container">
         <br><br>
-        <h1>Kcha crud</h1>
+        <h1>Kcha login</h1>
         <br><br>
 
         {% for message in get_flashed_messages() %}
@@ -24,13 +24,13 @@
 
         <form action="{{ url_for('login') }}" method="post" class="form-group">
             <dl>
-                <dt>Username:</dt>
+                <dt>Nombre de usuario:</dt>
                 <dd><input type="text" name="username" class="form-control col-sm-4"></dd>
                 <dt>Password:</dt>
                 <dd><input type="password" name="password" class="form-control col-sm-4"></dd>
                 <br><br>
-                <dd><input type="submit" class="btn btn-primary" value="login"></dd>
-                <span>Use "admin" for username and password</span>
+                <dd><input type="submit" class="btn btn-primary" value="entrar"></dd>
+                <span>Usa "admin" para nombre de usuario y password</span>
             </dl>
         </form>
     </div>

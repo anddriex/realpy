@@ -7,13 +7,13 @@
 <body>
     <div class="container">
         <br><br>
-        <h1>Kcha Flaskr-TDD</h1>
+        <h1>Kcha TDD</h1>
         <br><br>
 
         {% if not session.logged_in %}
-         <a class="btn btn-success" role="button" href="{{ url_for('login') }}">log in</a>
+         <a class="btn btn-success" role="button" href="{{ url_for('login') }}">Iniciar sesión</a>
         {% else %}
-         <a class="btn btn-warning" role="button" href="{{ url_for('logout') }}">log out</a>
+         <a class="btn btn-warning" role="button" href="{{ url_for('logout') }}">Cerrar sesión</a>
         {% endif %}
 
         <br><br>
@@ -25,12 +25,12 @@
         {% if session.logged_in %}
          <form action="{{ url_for('add_entry')}}" method="post" class="add-entry form-group">
              <dl>
-                 <dt>Title: </dt>
+                 <dt>Titulo: </dt>
                  <dd><input type="text" size="30" name="title" class="form-control col-sm-4"></dd>
-                 <dt>Text: </dt>
+                 <dt>Texto: </dt>
                  <dd><textarea name="text" rows="5" cols="40" class="form-control col-sm-4"></textarea></dd>
                  <br><br>
-                 <dd><input type="submit" class="btn btn-primary" value="Share"></dd>
+                 <dd><input type="submit" class="btn btn-primary" value="Compartir"></dd>
              </dl>
          </form>
         {% endif %}
@@ -46,7 +46,7 @@
                  <a href="{{ '/delete/%s'%entry.post_id }}" methods="get">Borrar</a>
              </li>
             {% else %}
-             <li><em>No entries yet. Add some!</em></li>
+             <li><em>No hay entradas. Agrega una ahora!</em></li>
             {% endfor %}
         </ul>
     </div>

@@ -1,19 +1,19 @@
 <!DOCTYPE html>
 <html>
 <head>
-    <title>Kacha Flaskr TDD | Editar</title>
+    <title>Kcha TDD | Editar</title>
     <link rel="stylesheet" type="text/css" href="https://stackpath.bootstrapcdn.com/bootstrap/4.3.1/css/bootstrap.min.css">
 </head>
 <body>
 <div class="container">
     <br><br>
-    <h1>Kcha Flaskr-TDD | Edicion</h1>
+    <h1>Kcha TDD | Editar post</h1>
     <br><br>
 
     {% if not session.logged_in %}
-    <a class="btn btn-success" role="button" href="{{ url_for('login') }}">log in</a>
+    <a class="btn btn-success" role="button" href="{{ url_for('login') }}">Iniciar sesión</a>
     {% else %}
-    <a class="btn btn-warning" role="button" href="{{ url_for('logout') }}">log out</a>
+    <a class="btn btn-warning" role="button" href="{{ url_for('logout') }}">Cerrar sesión</a>
     {% endif %}
 
     <br><br>
@@ -25,9 +25,9 @@
         {% if session.logged_in %}
          <form action="{{ url_for('edit_entry', post_id=update_post.post_id)}}" method="post" class="add-entry form-group">
             <dl>
-                <dt>Title: </dt>
+                <dt>Titulo: </dt>
                 <dd><input type="text" size="30" name="title" class="form-control col-sm-4" value="{{ update_post.title }}"></dd>
-                <dt>Text:</dt>
+                <dt>Texto:</dt>
                 <dd><textarea name="text" rows="5" cols="40" class="form-control col-sm-4">{{ update_post.text }}</textarea></dd>
                 <br><br>
                 <dd><input type="submit" class="btn btn-primary" value="Guardar"></dd>
