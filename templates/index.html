@@ -11,9 +11,9 @@
         <br><br>
 
         {% if not session.logged_in %}
-         <a class="btn btn-success" role="button" href="{{ url_for('login') }}">Iniciar sesión</a>
+         <a class="btn btn-success" role="button" href="{{ url_for('login') }}">login</a>
         {% else %}
-         <a class="btn btn-warning" role="button" href="{{ url_for('logout') }}">Cerrar sesión</a>
+         <a class="btn btn-warning" role="button" href="{{ url_for('logout') }}">logout</a>
         {% endif %}
 
         <br><br>
