@@ -2,22 +2,30 @@
 import os
 from functools import wraps
 
-from flask import (Flask, request, session, g, redirect, url_for,
-                   abort, render_template, flash, jsonify)
+from flask import (
+    Flask,
+    request,
+    session,
+    redirect,
+    url_for,
+    abort,
+    render_template,
+    flash,
+    jsonify,
+)
 from flask_sqlalchemy import SQLAlchemy
 
 # get the folder where this file runs
 basedir = os.path.abspath(os.path.dirname(__file__))
 
 # configuration
-SECRET_KEY = 'my_precious'
-USERNAME = 'admin'
-PASSWORD = 'admin'
+SECRET_KEY = "my_precious"
+USERNAME = "admin"
+PASSWORD = "admin"
 
 # database config
 SQLALCHEMY_DATABASE_URI = os.getenv(
-    'DATABASE_URL',
-    f'sqlite:///{os.path.join(basedir, "flaskr.db")}'
+    "DATABASE_URL", f'sqlite:///{os.path.join(basedir, "flaskr.db")}'
 )
 SQLALCHEMY_TRACK_MODIFICATIONS = False
 
@@ -32,58 +40,58 @@ import models
 def login_required(f):
     @wraps(f)
     def decorated_function(*args, **kwargs):
-        if not session.get('logged_in'):
-            flash('Please log in.')
-            return jsonify({'status': 0, 'message': 'Please log in.'}), 401
+        if not session.get("logged_in"):
+            flash("Please log in.")
+            return jsonify({"status": 0, "message": "Please log in."}), 401
         return f(*args, **kwargs)
 
     return decorated_function
 
 
-@app.route('/')
+@app.route("/")
 def index():
     """Searches the database for entries, then displays them."""
     entries = db.session.query(models.Flaskr)
-    return render_template('index.html', entries=entries)
+    return render_template("index.html", entries=entries)
 
 
-@app.route('/login', methods=['GET', 'POST'])
+@app.route("/login", methods=["GET", "POST"])
 def login():
     """User login/authentication/session management."""
     error = None
-    if request.method == 'POST':
-        if request.form['username'] != app.config['USERNAME']:
-            error = 'Nombre de usuario invalida'
-        elif request.form['password'] != app.config['PASSWORD']:
-            error = 'Password invalido'
+    if request.method == "POST":
+        if request.form["username"] != app.config["USERNAME"]:
+            error = "Nombre de usuario invalida"
+        elif request.form["password"] != app.config["PASSWORD"]:
+            error = "Password invalido"
         else:
-            session['logged_in'] = True
-            flash('Has iniciado sesión')
-            return redirect(url_for('index'))
-    return render_template('login.html', error=error)
+            session["logged_in"] = True
+            flash("Has iniciado sesión")
+            return redirect(url_for("index"))
+    return render_template("login.html", error=error)
 
 
-@app.route('/logout')
+@app.route("/logout")
 def logout():
     """User logout/authentication/session management"""
-    session.pop('logged_in', None)
-    flash('Sesión cerrada exitosamente')
-    return redirect(url_for('index'))
+    session.pop("logged_in", None)
+    flash("Sesión cerrada exitosamente")
+    return redirect(url_for("index"))
 
 
-@app.route('/add', methods=['POST'])
+@app.route("/add", methods=["POST"])
 def add_entry():
     """Add new post to database."""
-    if not session.get('logged_in'):
+    if not session.get("logged_in"):
         abort(401)
-    new_entry = models.Flaskr(request.form['title'], request.form['text'])
+    new_entry = models.Flaskr(request.form["title"], request.form["text"])
     db.session.add(new_entry)
     db.session.commit()
-    flash('Nueva entrada posteada!')
-    return redirect(url_for('index'))
+    flash("Nueva entrada posteada!")
+    return redirect(url_for("index"))
 
 
-@app.route('/delete/<int:post_id>', methods=['GET'])
+@app.route("/delete/<int:post_id>", methods=["GET"])
 @login_required
 def delete_entry(post_id):
     """Delete a post from database"""
@@ -91,45 +99,45 @@ def delete_entry(post_id):
         new_id = post_id
         db.session.query(models.Flaskr).filter_by(post_id=new_id).delete()
         db.session.commit()
-        flash('La entrada fue eliminada')
+        flash("La entrada fue eliminada")
     except Exception as e:
-        flash('ERROR: ', e)
+        flash("ERROR: ", e)
 
-    return redirect(url_for('index'))
+    return redirect(url_for("index"))
 
 
-@app.route('/edit/<int:post_id>', methods=['GET', 'POST'])
+@app.route("/edit/<int:post_id>", methods=["GET", "POST"])
 def edit_entry(post_id):
     """Edit a post from the database"""
-    update_post = db.session.query(models.Flaskr).get({'post_id': post_id})
-    if request.method == 'POST':
+    update_post = db.session.query(models.Flaskr).get({"post_id": post_id})
+    if request.method == "POST":
         try:
-            if not session.get('logged_in'):
+            if not session.get("logged_in"):
                 abort(401)
-            db.session.query(models.Flaskr) \
-                .filter_by(post_id=post_id).update({'title': request.form['title'],
-                                                    'text': request.form['text']})
+            db.session.query(models.Flaskr).filter_by(post_id=post_id).update(
+                {"title": request.form["title"], "text": request.form["text"]}
+            )
             db.session.commit()
-            flash('Entrada actualizada!')
+            flash("Entrada actualizada!")
         except Exception as e:
             flash(e)
 
-        return redirect(url_for('index'))
-    if session.get('logged_in'):
-        flash('Editar post')
+        return redirect(url_for("index"))
+    if session.get("logged_in"):
+        flash("Editar post")
     else:
-        flash('Inicia sesión para editar')
-    return render_template('edit.html', update_post=update_post)
+        flash("Inicia sesión para editar")
+    return render_template("edit.html", update_post=update_post)
 
 
-@app.route('/search', methods=['GET'])
+@app.route("/search", methods=["GET"])
 def search():
-    query = request.args.get('query')
+    query = request.args.get("query")
     entries = db.session.query(models.Flaskr)
     if query:
-        return render_template('search.html', entries=entries, query=query)
-    return render_template('search.html')
+        return render_template("search.html", entries=entries, query=query)
+    return render_template("search.html")
 
 
-if __name__ == '__main__':
+if __name__ == "__main__":
     app.run()
