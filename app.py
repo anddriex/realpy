@@ -1,26 +1,24 @@
 # imports
 import os
+from functools import wraps
 
 from flask import (Flask, request, session, g, redirect, url_for,
                    abort, render_template, flash, jsonify)
 from flask_sqlalchemy import SQLAlchemy
-from functools import wraps
 
 # get the folder where this file runs
 basedir = os.path.abspath(os.path.dirname(__file__))
 
 # configuration
-DATABASE = 'flaskr.db'
-DEBUG = True
 SECRET_KEY = 'my_precious'
 USERNAME = 'admin'
 PASSWORD = 'admin'
 
-# define the full path for the database
-DATABASE_PATH = os.path.join(basedir, DATABASE)
-
 # database config
-SQLALCHEMY_DATABASE_URI = 'sqlite:///' + DATABASE_PATH
+SQLALCHEMY_DATABASE_URI = os.getenv(
+    'DABASE_URL',
+    f'sqlite:///{os.path.join(basedir, "flaskr.db")}'
+)
 SQLALCHEMY_TRACK_MODIFICATIONS = False
 
 # create and initialize app
