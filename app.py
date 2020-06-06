@@ -16,7 +16,7 @@ PASSWORD = 'admin'
 
 # database config
 SQLALCHEMY_DATABASE_URI = os.getenv(
-    'DABASE_URL',
+    'DATABASE_URL',
     f'sqlite:///{os.path.join(basedir, "flaskr.db")}'
 )
 SQLALCHEMY_TRACK_MODIFICATIONS = False
