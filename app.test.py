@@ -94,8 +94,22 @@ class FlaskrTestCase(unittest.TestCase):
 
     def test_delete_message(self):
         """Ensure the messages are being deleted."""
+        self.login(app.config['USERNAME'], app.config['PASSWORD'])
         rv = self.app.get('/delete/1', follow_redirects=True)
         self.assertIn(b'No hay entradas. Agrega una ahora!', rv.data)
+
+    def test_search_posts(self):
+        """Ensure to messages are being queried"""
+        self.post_new_message(title_msg='<Hello>', text_msg='<strong>HTML</strong> allowed here')
+        self.post_new_message(title_msg='<GoodBye>', text_msg='<strong>HTML</strong> allowed here')
+        rv = self.app.get('/search?query=Hello')
+        self.assertIn(b'&lt;Hello&gt;', rv.data)
+        self.assertNotIn(b'&lt;GoodBye&gt;', rv.data)
+
+    def test_delete_message_only_for_registered_user(self):
+        """Ensure only registered users can delete messages"""
+        rv = self.app.get('/delete/1', follow_redirects=True)
+        self.assertIn(b'Please log in.', rv.data)
 
 
 if __name__ == '__main__':

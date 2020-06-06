@@ -4,6 +4,7 @@ import os
 from flask import (Flask, request, session, g, redirect, url_for,
                    abort, render_template, flash, jsonify)
 from flask_sqlalchemy import SQLAlchemy
+from functools import wraps
 
 # get the folder where this file runs
 basedir = os.path.abspath(os.path.dirname(__file__))
@@ -28,6 +29,17 @@ app.config.from_object(__name__)
 db = SQLAlchemy(app)
 
 import models
+
+
+def login_required(f):
+    @wraps(f)
+    def decorated_function(*args, **kwargs):
+        if not session.get('logged_in'):
+            flash('Please log in.')
+            return jsonify({'status': 0, 'message': 'Please log in.'}), 401
+        return f(*args, **kwargs)
+
+    return decorated_function
 
 
 @app.route('/')
@@ -74,6 +86,7 @@ def add_entry():
 
 
 @app.route('/delete/<int:post_id>', methods=['GET'])
+@login_required
 def delete_entry(post_id):
     """Delete a post from database"""
     try:
@@ -109,6 +122,15 @@ def edit_entry(post_id):
     else:
         flash('Inicia sesión para editar')
     return render_template('edit.html', update_post=update_post)
+
+
+@app.route('/search', methods=['GET'])
+def search():
+    query = request.args.get('query')
+    entries = db.session.query(models.Flaskr)
+    if query:
+        return render_template('search.html', entries=entries, query=query)
+    return render_template('search.html')
 
 
 if __name__ == '__main__':

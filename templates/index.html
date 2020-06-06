@@ -10,6 +10,8 @@
         <h1>Pomodoro K</h1>
         <br><br>
 
+        <a class="btn btn-info" role="button" href="{{ url_for('search') }}">Search</a>
+
         {% if not session.logged_in %}
          <a class="btn btn-success" role="button" href="{{ url_for('login') }}">login</a>
         {% else %}
