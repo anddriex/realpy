@@ -30,7 +30,6 @@ oauthlib==3.1.0
 openpyxl==3.0.3
 pdfminer.six==20200104
 Pillow==7.0.0
-pkg-resources==0.0.0
 protobuf==3.11.2
 pyasn1==0.4.8
 pyasn1-modules==0.2.7
@@ -47,5 +46,4 @@ sortedcontainers==2.1.0
 uritemplate==3.0.1
 urllib3==1.25.7
 XlsxWriter==1.2.7
-
 psycopg2-binary==2.8.4
