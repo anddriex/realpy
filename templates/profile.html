@@ -6,14 +6,39 @@
     </head>
     <body>
         <div class="container">
-            <ul class="entries">
+<!--            {% for message in get_flashed_messages() %}-->
+<!--                <div class="flash alert alert-success col-sm-4" role="success">{{ message }}</div>-->
+<!--            {% endfor %}-->
+            <nav class="profile navbar navbar-expand-lg navbar-light bg-light">
+                <a class="navbar-brand" href="#">PK Abogados</a>
+                <button class="navbar-toggler" type="button" data-toggle="collapse" data-target="#navbarSupportedContent" aria-controls="navbarSupportedContent" aria-expanded="false" aria-label="Toggle navigation">
+                    <span class="navbar-toggler-icon"></span>
+                </button>
+
+                <div class="collapse navbar-collapse" id="navbarSupportedContent">
+                    <ul class="navbar-nav mr-auto">
+                     <li class="nav-item">
+                        <a class="nav-link" href="{{ '/bfiles' }}" methods="get"> Home </a>
+                      </li>
+                      <li class="nav-item">
+                        <a class="nav-link active" href="#"> Casos </a>
+                      </li>
+                    </ul>
+                    {% if not session.logged_in %}
+                        <button class="btn btn-success" role="button" href="{{ url_for('login') }}">login</button>
+                    {% else %}
+                        <button class="btn btn-warning" role="button" href="{{ url_for('logout') }}">logout</button>
+                    {% endif %}
+                </div>
+            </nav>
+            <ul class="list-group">
             {% for file in files %}
-             <li class="entry">
+             <li class="list-group-item">
                  <h2 id="{{ file.id }}">{{ file.name }}</h2>
-                 <a href="{{ '/case/%s'%file.id }}" methods="get">Solicitar Caso</a>
+                 <a href="{{ '/case/%s'%file.id }}" methods="get">Clasificar</a>
              </li>
             {% else %}
-             <li><em>No hay archivos!</em></li>
+                <li class="list-group-item"><em>No hay archivos!</em></li>
             {% endfor %}
             </ul>
         </div>

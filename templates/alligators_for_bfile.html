@@ -6,16 +6,30 @@
     </head>
     <body>
         <div class="container">
-            <ul class="entries">
+            <nav class="profile navbar navbar-expand-lg navbar-light bg-light">
+                <a class="navbar-brand" href="#">PK Abogados</a>
+                <button class="navbar-toggler" type="button" data-toggle="collapse" data-target="#navbarSupportedContent" aria-controls="navbarSupportedContent" aria-expanded="false" aria-label="Toggle navigation">
+                    <span class="navbar-toggler-icon"></span>
+                </button>
+
+                <div class="collapse navbar-collapse" id="navbarSupportedContent">
+                    <ul class="navbar-nav mr-auto">
+                     <li class="nav-item">
+                        <a class="nav-link" href="{{ '/bfiles' }}" methods="get"> Home </a>
+                      </li>
+                    </ul>
+                </div>
+            </nav>
+            <ul class="list-group">
             {% for al in allis %}
-             <li class="alligator">
-                 <h2 id="{{ al.id }}">{{ al.name }}</h2>
-                 <p>{{ al.email | safe }}</p>
-                 <p>Experiencia: {{ al.experience | safe }}</p>
-                 <a href="{{ '/bfiles/%s'%al.id }}" methods="get">Asignar Caso</a>
+             <li id="{{ al.id }}" class="list-group-item">
+                 <p><span class="font-weight-bold">Abogado: </span> {{ al.name | safe }}</p>
+                 <p><span class="font-weight-bold">Correo electrónico: </span> {{ al.email | safe }}</p>
+                 <p><span class="font-weight-bold">Experiencia: </span>{{ al.experience | safe }} años </p>
+                 <a href="{{ '/assign_alligator/%s/%s'%(al.id, bfile_id) }}" methods="get">Asignar Caso</a>
              </li>
             {% else %}
-             <li><em>No hay abogados para el caso!</em></li>
+             <li class="list-group-item"><em>No hay abogados para el caso!</em></li>
             {% endfor %}
             </ul>
         </div>

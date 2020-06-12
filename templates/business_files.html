@@ -6,13 +6,48 @@
     </head>
     <body>
         <div class="container">
-            <ul class="entries">
+            <nav class="profile navbar navbar-expand-lg navbar-light bg-light">
+                <a class="navbar-brand" href="#">PK Abogados</a>
+                <button class="navbar-toggler" type="button" data-toggle="collapse" data-target="#navbarSupportedContent" aria-controls="navbarSupportedContent" aria-expanded="false" aria-label="Toggle navigation">
+                    <span class="navbar-toggler-icon"></span>
+                </button>
+
+                <div class="collapse navbar-collapse" id="navbarSupportedContent">
+                    <ul class="navbar-nav mr-auto">
+                     <li class="nav-item">
+                        <a class="nav-link active" href="#"> Home </a>
+                      </li>
+                     <li class="nav-item">
+                        <a class="nav-link" href=" {{ '/files' }}"> Casos </a>
+                     </li>
+                    </ul>
+                    {% if not session.logged_in %}
+                        <a class="btn btn-success" role="button" href="{{ url_for('login') }}">login</a>
+                    {% else %}
+                        <a class="btn btn-warning" role="button" href="{{ url_for('logout') }}">logout</a>
+                    {% endif %}
+                </div>
+            </nav>
+            <ul class="list-group">
             {% for bfile in bfiles %}
-             <li class="entry">
+             <li class="list-group-item">
                  <h2 id="{{ bfile.id }}">{{ bfile.name }}</h2>
-                 <p>{{ bfile.type | safe }}</p>
-                 <p>{{ bfile.status | safe }}</p>
-                 <a href="{{ '/bfiles/%s'%bfile.id }}" methods="get">especialistas sugeridos</a>
+                 <p> <span class="font-weight-bold">Especialidad:</span> {{ bfile.type | safe }}</p>
+
+                 <div class="w-50 ">
+                     {% if bfile.status == 'disponible' %}
+                       <p class="bg-info p-1 w-25 d-flex justify-content-center text-white">{{ bfile.status | safe }}</p>
+                     {% elif bfile.status == 'en curso' %}
+                        <p class="bg-primary p-1 w-25 d-flex justify-content-center text-white">{{ bfile.status | safe }}</p>
+                     {% else %}
+                        <p class="bg-success p-1 w-25 d-flex justify-content-center text-white">{{ bfile.status | safe }}</p>
+                     {% endif %}
+    <!--                 <p class="bg-info">{{ bfile.status | safe }}</p>-->
+                 </div>
+
+                  {% if bfile.status == 'disponible' %}
+                    <a href="{{ '/bfiles/%s'%bfile.id }}" methods="get">especialistas sugeridos</a>
+                  {% endif %}
              </li>
             {% else %}
              <li><em>No hay casos!</em></li>

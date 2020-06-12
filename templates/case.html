@@ -5,14 +5,29 @@
         <link rel="stylesheet" type="text/css" href="https://stackpath.bootstrapcdn.com/bootstrap/4.3.1/css/bootstrap.min.css">
     </head>
     <body>
+    <div class="container">
+        <br><br>
+        <h2>Clasificación del caso</h2>
+        <br><br>
+
+<!--        {% for message in get_flashed_messages() %}-->
+<!--         <div class="flash alert alert-success col-sm-4" role="success">{{ message }}</div>-->
+<!--        {% endfor %}-->
+
+         {% block body %}{% endblock %}
+
         <form action="{{ url_for('enter_case', gdrive_id=case.id) }}" method="post" class="add-entry form-group">
             <dl>
                 <dt>Tipo: </dt>
                 <dd><input type="text" size="30" name="type" class="form-control col-sm-4" value="{{ case.type }}"></dd>
                 <dt>Nombre: </dt>
                 <dd><input type="text" size="30" name="name" class="form-control col-sm-4" value="{{ case.name }}"></dd>
-                <dd><input type="submit" class="btn btn-primary" value="Guardar"></dd>
+                <div class="d-flex justify-content-start">
+                    <dd><input type="submit" class="btn btn-primary m-1" value="Guardar"></dd>
+                    <dd><a href="{{ '/files' }}" class="btn btn-danger m-1">Cancelar</a></dd>
+                </div>
             </dl>
         </form>
+    </div>
     <body>
 </html>

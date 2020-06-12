@@ -70,12 +70,12 @@ def enter_case(gdrive_id):
     file_info = get_user_file(gdrive_id)
     if request.method == 'POST':
         print(request.form['name'])
-        new_name = f"{request.form['name']}.{file_info['name'].split('.')[1]}"\
+        new_name = f"{request.form['name']}.{file_info['name'].split('.')[1]}" \
             if len(file_info['name'].split('.')) > 1 else file_info['name']
         new_bf = models.BusinessFile(gdrive_id=gdrive_id,
                                      type=request.form['type'],
                                      name=new_name,
-                                     status='available')
+                                     status='disponible')
         db.session.add(new_bf)
         db.session.commit()
         flash("Nueva archivo solicitado!")
@@ -99,7 +99,7 @@ def login():
         else:
             session["logged_in"] = True
             flash("Has iniciado sesión")
-            return redirect(url_for("index"))
+            return redirect(url_for("files"))
     return render_template("login.html", error=error)
 
 
@@ -172,6 +172,7 @@ def search():
 
 
 @app.route('/bfiles/<int:bfile_id>', methods=['GET'])
+@login_required
 def get_business_file(bfile_id):
     busi_file = db.session.query(models.BusinessFile).get({"id": bfile_id})
     alligators_for_file = []
@@ -179,15 +180,17 @@ def get_business_file(bfile_id):
         for alli in db.session.query(models.Professional):
             if busi_file.type == alli.speciality:
                 alligators_for_file.append({
+                    'id': alli.id,
                     'name': alli.user.username,
                     'email': alli.user.email,
-                    'experience':  alli.experience
+                    'experience': alli.experience
                 })
     flash('Especialistas para archivo de negocio')
-    return render_template('alligators_for_bfile.html', allis=alligators_for_file)
+    return render_template('alligators_for_bfile.html', allis=alligators_for_file, bfile_id=bfile_id)
 
 
-@app.route('/bfiles', methods=['GET'])
+@app.route('/bfiles/', methods=['GET'])
+@login_required
 def get_business_files():
     cases = db.session.query(models.BusinessFile)
     return render_template('business_files.html', bfiles=cases)
@@ -204,6 +207,19 @@ def add_specialist():
     db.session.commit()
     flash("Nueva especialista agregado!")
     return redirect(url_for("index"))
+
+
+@app.route('/assign_alligator/<int:professional_id>/<int:business_file_id>', methods=['GET'])
+@login_required
+def assign_specialist(professional_id, business_file_id):
+    professional = db.session.query(models.Professional).get({"id": professional_id})
+    business_file = db.session.query(models.BusinessFile).get({"id": business_file_id})
+    if professional and business_file:
+        business_file.reviewer = professional
+        business_file.status = "en curso"
+        flash('Abogado asignado!')
+        db.session.commit()
+    return redirect(url_for("get_business_files"))
 
 
 if __name__ == "__main__":
