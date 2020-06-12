@@ -1,4 +1,5 @@
 # imports
+import json
 import os
 
 from functools import wraps
@@ -73,7 +74,7 @@ def enter_case(gdrive_id):
             if len(file_info['name'].split('.')) > 1 else file_info['name']
         new_bf = models.BusinessFile(gdrive_id=gdrive_id,
                                      type=request.form['type'],
-                                     name= new_name,
+                                     name=new_name,
                                      status='available')
         db.session.add(new_bf)
         db.session.commit()
@@ -168,6 +169,41 @@ def search():
     if query:
         return render_template("search.html", entries=entries, query=query)
     return render_template("search.html")
+
+
+@app.route('/bfiles/<int:bfile_id>', methods=['GET'])
+def get_business_file(bfile_id):
+    busi_file = db.session.query(models.BusinessFile).get({"id": bfile_id})
+    alligators_for_file = []
+    if busi_file:
+        for alli in db.session.query(models.Professional):
+            if busi_file.type == alli.speciality:
+                alligators_for_file.append({
+                    'name': alli.user.username,
+                    'email': alli.user.email,
+                    'experience':  alli.experience
+                })
+    flash('Especialistas para archivo de negocio')
+    return render_template('alligators_for_bfile.html', allis=alligators_for_file)
+
+
+@app.route('/bfiles', methods=['GET'])
+def get_business_files():
+    cases = db.session.query(models.BusinessFile)
+    return render_template('business_files.html', bfiles=cases)
+
+
+@app.route('/add_specialist', methods=['POST'])
+def add_specialist():
+    specialist = json.loads(request.data)
+    new_usr = models.User(specialist["username"], specialist["email"], specialist["password"])
+    db.session.add(new_usr)
+    new_pro = models.Professional(specialist['experience'], specialist['speciality'])
+    new_usr.speciality = new_pro
+    db.session.add(new_pro)
+    db.session.commit()
+    flash("Nueva especialista agregado!")
+    return redirect(url_for("index"))
 
 
 if __name__ == "__main__":

@@ -1,0 +1,23 @@
+<!DOCTYPE html>
+<html>
+    <head>
+        <title>Pomodoro K | Admin Casos </title>
+        <link rel="stylesheet" type="text/css" href="https://stackpath.bootstrapcdn.com/bootstrap/4.3.1/css/bootstrap.min.css">
+    </head>
+    <body>
+        <div class="container">
+            <ul class="entries">
+            {% for bfile in bfiles %}
+             <li class="entry">
+                 <h2 id="{{ bfile.id }}">{{ bfile.name }}</h2>
+                 <p>{{ bfile.type | safe }}</p>
+                 <p>{{ bfile.status | safe }}</p>
+                 <a href="{{ '/bfiles/%s'%bfile.id }}" methods="get">especialistas sugeridos</a>
+             </li>
+            {% else %}
+             <li><em>No hay casos!</em></li>
+            {% endfor %}
+            </ul>
+        </div>
+    <body>
+</html>

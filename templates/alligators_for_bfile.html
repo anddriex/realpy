@@ -1,0 +1,23 @@
+<!DOCTYPE html>
+<html>
+    <head>
+        <title>Pomodoro K | Admin Casos </title>
+        <link rel="stylesheet" type="text/css" href="https://stackpath.bootstrapcdn.com/bootstrap/4.3.1/css/bootstrap.min.css">
+    </head>
+    <body>
+        <div class="container">
+            <ul class="entries">
+            {% for al in allis %}
+             <li class="alligator">
+                 <h2 id="{{ al.id }}">{{ al.name }}</h2>
+                 <p>{{ al.email | safe }}</p>
+                 <p>Experiencia: {{ al.experience | safe }}</p>
+                 <a href="{{ '/bfiles/%s'%al.id }}" methods="get">Asignar Caso</a>
+             </li>
+            {% else %}
+             <li><em>No hay abogados para el caso!</em></li>
+            {% endfor %}
+            </ul>
+        </div>
+    <body>
+</html>
