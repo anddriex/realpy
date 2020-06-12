@@ -1,6 +1,8 @@
 import os
 import unittest
+from unittest.mock import patch
 
+import models
 from app import app, db
 
 TEST_DB = "test.db"
@@ -22,10 +24,9 @@ class FlaskrTestCase(unittest.TestCase):
     def setUp(self):
         """Set up a blank temp database before each test."""
         basedir = os.path.abspath(os.path.dirname(__file__))
-        app.config["TESTING"] = True
-        app.config["SQLALCHEMY_DATABASE_URI"] = "sqlite:///" + os.path.join(
-            basedir, TEST_DB
-        )
+        app.config['TESTING'] = True
+        app.config['SQLALCHEMY_DATABASE_URI'] = 'sqlite:///' + \
+                                                os.path.join(basedir, TEST_DB)
         self.app = app.test_client()
         db.create_all()
 
@@ -114,6 +115,52 @@ class FlaskrTestCase(unittest.TestCase):
         """Ensure only registered users can delete messages"""
         rv = self.app.get("/delete/1", follow_redirects=True)
         self.assertIn(b"Please log in.", rv.data)
+
+    @patch('app.get_user_file')
+    def test_get_case(self, mock_get_user_file):
+        mock_get_user_file.return_value = {
+            'id': 'jedi1',
+            'name': 'namecusein.pdf'
+        }
+        rv = self.app.get('case/jedi1', follow_redirects=True)
+        self.assertIn(b'type', rv.data)
+        self.assertIn(b'namecusein', rv.data)
+
+    @patch('app.get_user_file')
+    def test_add_businessfile_type(self, mock_get_user_file):
+        mock_get_user_file.return_value = {
+            'id': 'jedi1',
+            'name': 'namecusein.pdf'
+        }
+        self.app.post('/case/jedi1',
+                      data={'type': 'Public', 'name': 'cusein'})
+        self.assertEqual(db.session.query(models.BusinessFile).count(), 1)
+        bf = db.session.query(models.BusinessFile).first()
+        self.assertEqual(bf.gdrive_id, 'jedi1')
+        self.assertEqual(bf.type, 'Public')
+        self.assertEqual(bf.status, 'available')
+        self.assertEqual(bf.name, 'cusein.pdf')
+
+    @patch('app.get_user_files')
+    @patch('app.get_user_file')
+    def test_list_available_cases(self, mock_get_user_file, mocked_get_user_files):
+        mock_values = [
+            {
+                'id': 'jedi1',
+                'name': 'namecusein.pdf'
+            },
+            {
+                'id': 'sith',
+                'name': 'revenge.docx'
+            },
+        ]
+        mocked_get_user_files.return_value = mock_values
+        mock_get_user_file.return_value = mock_values[0]
+        self.app.post('/case/jedi1', data={'type': 'Public', 'name': 'namecusein'})
+
+        rv = self.app.get('/files', follow_redirects=True)
+        self.assertIn(b'revenge', rv.data)
+        self.assertNotIn(b'namecusein', rv.data)
 
 
 if __name__ == "__main__":

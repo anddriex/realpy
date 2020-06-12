@@ -1,0 +1,21 @@
+<!DOCTYPE html>
+<html>
+    <head>
+        <title>Pomodoro K | Profile</title>
+        <link rel="stylesheet" type="text/css" href="https://stackpath.bootstrapcdn.com/bootstrap/4.3.1/css/bootstrap.min.css">
+    </head>
+    <body>
+        <div class="container">
+            <ul class="entries">
+            {% for file in files %}
+             <li class="entry">
+                 <h2 id="{{ file.id }}">{{ file.name }}</h2>
+                 <a href="{{ '/case/%s'%file.id }}" methods="get">Solicitar Caso</a>
+             </li>
+            {% else %}
+             <li><em>No hay archivos!</em></li>
+            {% endfor %}
+            </ul>
+        </div>
+    <body>
+</html>

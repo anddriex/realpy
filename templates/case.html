@@ -1,0 +1,18 @@
+<!DOCTYPE html>
+<html>
+    <head>
+        <title>Pomodoro K | Profile</title>
+        <link rel="stylesheet" type="text/css" href="https://stackpath.bootstrapcdn.com/bootstrap/4.3.1/css/bootstrap.min.css">
+    </head>
+    <body>
+        <form action="{{ url_for('enter_case', gdrive_id=case.id) }}" method="post" class="add-entry form-group">
+            <dl>
+                <dt>Tipo: </dt>
+                <dd><input type="text" size="30" name="type" class="form-control col-sm-4" value="{{ case.type }}"></dd>
+                <dt>Nombre: </dt>
+                <dd><input type="text" size="30" name="name" class="form-control col-sm-4" value="{{ case.name }}"></dd>
+                <dd><input type="submit" class="btn btn-primary" value="Guardar"></dd>
+            </dl>
+        </form>
+    <body>
+</html>

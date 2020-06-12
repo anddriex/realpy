@@ -1,5 +1,6 @@
 # imports
 import os
+
 from functools import wraps
 
 from flask import (
@@ -14,6 +15,7 @@ from flask import (
     jsonify,
 )
 from flask_sqlalchemy import SQLAlchemy
+from google_drive.gdrive_service import get_user_files, get_user_file
 
 # get the folder where this file runs
 basedir = os.path.abspath(os.path.dirname(__file__))
@@ -53,6 +55,35 @@ def index():
     """Searches the database for entries, then displays them."""
     entries = db.session.query(models.Flaskr)
     return render_template("index.html", entries=entries)
+
+
+@app.route('/files')
+def files():
+    new_user_files = models.get_businessfiles(get_user_files())
+    return render_template('profile.html',
+                           files=new_user_files)
+
+
+@app.route('/case/<string:gdrive_id>', methods=['GET', 'POST'])
+def enter_case(gdrive_id):
+    file_info = get_user_file(gdrive_id)
+    if request.method == 'POST':
+        print(request.form['name'])
+        new_name = f"{request.form['name']}.{file_info['name'].split('.')[1]}"\
+            if len(file_info['name'].split('.')) > 1 else file_info['name']
+        new_bf = models.BusinessFile(gdrive_id=gdrive_id,
+                                     type=request.form['type'],
+                                     name= new_name,
+                                     status='available')
+        db.session.add(new_bf)
+        db.session.commit()
+        flash("Nueva archivo solicitado!")
+        return redirect(url_for('files'))
+
+    return render_template('case.html',
+                           case={'name': file_info['name'].split('.')[0],
+                                 'id': gdrive_id,
+                                 'type': ''})
 
 
 @app.route("/login", methods=["GET", "POST"])
