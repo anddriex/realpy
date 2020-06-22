@@ -16,6 +16,7 @@ from flask import (
     jsonify,
 )
 from flask_sqlalchemy import SQLAlchemy
+from sqlalchemy import and_, text
 from google_drive.gdrive_service import get_user_files, get_user_file
 
 # get the folder where this file runs
@@ -99,14 +100,21 @@ def login():
     """User login/authentication/session management."""
     error = None
     if request.method == "POST":
-        if request.form["username"] != app.config["USERNAME"]:
-            error = "Nombre de usuario invalida"
-        elif request.form["password"] != app.config["PASSWORD"]:
-            error = "Password invalido"
-        else:
-            session["logged_in"] = True
-            flash("Has iniciado sesión")
-            return redirect(url_for("files"))
+        # query = text("SELECT * FROM user where username = '"
+        #              + request.form['username'] + "' AND password = '"
+        #              + request.form['password'] + "'")
+        try:
+            query_username = db.session.query(models.User).filter_by(username=request.form['username']).all()
+            # result = db.engine.execute(query_username)
+            print(query_username)
+            if query_username and query_username[0].password == request.form['password']:
+                session["logged_in"] = True
+                flash("ÉXITO: has iniciado sesión")
+                return redirect(url_for("index"))
+            else:
+                error = "accesos incorrectos"
+        except Exception as e:
+            error = e
     return render_template("login.html", error=error)
 
 
@@ -194,6 +202,16 @@ def get_business_file(bfile_id):
                 })
     flash('Especialistas para archivo de negocio')
     return render_template('alligators_for_bfile.html', allis=alligators_for_file, bfile_id=bfile_id)
+
+
+@app.route('/add_user', methods=['POST'])
+def add_user():
+    user = json.loads(request.data)
+    nw_usr = models.User(user['username'], user['email'], user['password'])
+    db.session.add(nw_usr)
+    db.session.commit()
+    flash("Nuevo usuario creado!")
+    return redirect(url_for("index"))
 
 
 @app.route('/bfiles/', methods=['GET'])
