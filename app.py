@@ -39,6 +39,13 @@ db = SQLAlchemy(app)
 
 import models
 
+STATUS = [
+    'patente',
+    'derecho',
+    'laboral',
+    'publico'
+]
+
 
 def login_required(f):
     @wraps(f)
@@ -220,6 +227,22 @@ def assign_specialist(professional_id, business_file_id):
         flash('Abogado asignado!')
         db.session.commit()
     return redirect(url_for("get_business_files"))
+
+
+@app.route('/report/')
+def get_report():
+    business_files = db.session.query(models.BusinessFile)
+    dict_bf_qty = {}
+    for bf in business_files:
+        if not dict_bf_qty.get(bf.type):
+            dict_bf_qty[bf.type] = 1
+        else:
+            dict_bf_qty[bf.type] += 1
+    count = (0, '')
+    for type in dict_bf_qty.keys():
+        if dict_bf_qty.get(type) > count[0]:
+            count = (dict_bf_qty.get(type), type)
+    return render_template('report.html', count=count[0], type=count[1])
 
 
 if __name__ == "__main__":

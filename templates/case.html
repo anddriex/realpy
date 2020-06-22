@@ -19,7 +19,15 @@
         <form action="{{ url_for('enter_case', gdrive_id=case.id) }}" method="post" class="add-entry form-group">
             <dl>
                 <dt>Tipo: </dt>
-                <dd><input type="text" size="30" name="type" class="form-control col-sm-4" value="{{ case.type }}"></dd>
+                <div class="form-group col-md-4 p-0">
+                    <select  class="form-control" name="type">
+                        <option>patente</option>
+                        <option>derecho</option>
+                        <option>laboral</option>
+                        <option>publico</option>
+                    </select>
+                </div>
+<!--                <dd><input type="text" size="30" name="type" class="form-control col-sm-4" value="{{ case.type }}"></dd>-->
                 <dt>Nombre: </dt>
                 <dd><input type="text" size="30" name="name" class="form-control col-sm-4" value="{{ case.name }}"></dd>
                 <div class="d-flex justify-content-start">

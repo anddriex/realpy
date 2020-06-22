@@ -18,23 +18,21 @@
                         <a class="nav-link" href="{{ '/bfiles' }}" methods="get"> Home </a>
                       </li>
                      <li class="nav-item">
-                        <a class="nav-link" href=" {{ '/report' }}"> Reporte </a>
+                        <a class="nav-link" href=" {{ '/files' }}"> Casos </a>
+                     </li>
+                     <li class="nav-item">
+                        <a class="nav-link active" href="#"> Reporte </a>
                      </li>
                     </ul>
                 </div>
             </nav>
-            <ul class="list-group">
-            {% for al in allis %}
-             <li id="{{ al.id }}" class="list-group-item">
-                 <p><span class="font-weight-bold">Abogado: </span> {{ al.name | safe }}</p>
-                 <p><span class="font-weight-bold">Correo electrónico: </span> {{ al.email | safe }}</p>
-                 <p><span class="font-weight-bold">Experiencia: </span>{{ al.experience | safe }} años </p>
-                 <a href="{{ '/assign_alligator/%s/%s'%(al.id, bfile_id) }}" methods="get">Asignar Caso</a>
-             </li>
-            {% else %}
-             <li class="list-group-item"><em>No hay abogados para el caso!</em></li>
-            {% endfor %}
-            </ul>
+                            <br><br>
+            <h2>Mayor cantidad de documentos por especialidad</h2>
+            <div class="col-md-4">
+                <br><br>
+                <dd><p><span class="font-weight-bold">Especialidad: </span>  {{ type }}</p></dd>
+                <dd><p><span class="font-weight-bold">Numero de documentos: </span> {{ count }}</p></dd>
+            </div>
         </div>
     <body>
 </html>

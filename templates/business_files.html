@@ -20,6 +20,9 @@
                      <li class="nav-item">
                         <a class="nav-link" href=" {{ '/files' }}"> Casos </a>
                      </li>
+                     <li class="nav-item">
+                        <a class="nav-link" href=" {{ '/report' }}"> Reporte </a>
+                     </li>
                     </ul>
                     {% if not session.logged_in %}
                         <a class="btn btn-success" role="button" href="{{ url_for('login') }}">login</a>
@@ -50,7 +53,7 @@
                   {% endif %}
              </li>
             {% else %}
-             <li><em>No hay casos!</em></li>
+             <li class="list-group-item"><em>No hay casos!</em></li>
             {% endfor %}
             </ul>
         </div>
