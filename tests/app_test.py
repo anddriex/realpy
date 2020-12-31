@@ -3,22 +3,25 @@ import os
 import unittest
 from unittest.mock import patch
 
-import models
-from app import app, db
+import project.models as models
+from project.app import app, db
+from pathlib import Path
 
 TEST_DB = "test.db"
 
+def test_index():
+    """initial test. ensure flask was set up correctly"""
+    tester = app.test_client()
+    response = tester.get("/", content_type="html/text")
+    assert response.status_code == 200
 
-class BasicTestCase(unittest.TestCase):
-    def test_index(self):
-        """initial test. ensure flask was set up correctly"""
-        tester = app.test_client(self)
-        response = tester.get("/", content_type="html/text")
-        self.assertEqual(response.status_code, 200)
 
-    def test_database(self):
-        tester = os.path.exists("flaskr.db")
-        self.assertTrue(tester)
+def test_database():
+    assert Path("project/flaskr.db").is_file()
+
+
+
+
 
 
 class FlaskrTestCase(unittest.TestCase):
@@ -85,7 +88,7 @@ class FlaskrTestCase(unittest.TestCase):
         rv = self.app.get("/")
         self.assertIn(b"No hay entradas. Agrega una ahora!", rv.data)
 
-    @patch('app.get_user_files')
+    @patch('project.app.get_user_files')
     def test_login_logout(self, mocked_get_user_files):
         """Test login and logout using helper functions."""
         mocked_get_user_files.return_value = self.mock_values
@@ -121,7 +124,7 @@ class FlaskrTestCase(unittest.TestCase):
         self.assertIn(b"Bye", rv.data)
         self.assertIn(b"doom", rv.data)
 
-    @patch('app.get_user_files')
+    @patch('project.app.get_user_files')
     def test_delete_message(self, mocked_get_user_files):
         """Ensure the messages are being deleted."""
         mocked_get_user_files.return_value = self.mock_values
@@ -146,14 +149,14 @@ class FlaskrTestCase(unittest.TestCase):
         rv = self.app.get("/delete/1", follow_redirects=True)
         self.assertIn(b"Please log in.", rv.data)
 
-    @patch('app.get_user_file')
+    @patch('project.app.get_user_file')
     def test_get_case(self, mock_get_user_file):
         mock_get_user_file.return_value = self.mock_busi_file_data
         rv = self.app.get('case/jedi1', follow_redirects=True)
         self.assertIn(b'type', rv.data)
         self.assertIn(b'namecusein', rv.data)
 
-    @patch('app.get_user_file')
+    @patch('project.app.get_user_file')
     def test_add_businessfile_type(self, mock_get_user_file):
         mock_get_user_file.return_value = self.mock_busi_file_data
         self.app.post('/case/jedi1',
@@ -165,8 +168,8 @@ class FlaskrTestCase(unittest.TestCase):
         self.assertEqual(bf.status, 'disponible')
         self.assertEqual(bf.name, 'cusein.pdf')
 
-    @patch('app.get_user_files')
-    @patch('app.get_user_file')
+    @patch('project.app.get_user_files')
+    @patch('project.app.get_user_file')
     def test_list_available_cases(self, mock_get_user_file, mocked_get_user_files):
         mocked_get_user_files.return_value = self.mock_values
         self.login(app.config["USERNAME"], app.config["PASSWORD"])
@@ -178,8 +181,8 @@ class FlaskrTestCase(unittest.TestCase):
         self.assertIn(b'revenge', rv.data)
         self.assertNotIn(b'namecusein', rv.data)
 
-    @patch('app.get_user_files')
-    @patch('app.get_user_file')
+    @patch('project.app.get_user_files')
+    @patch('project.app.get_user_file')
     def test_list_business_files(self, mock_get_user_file, mocked_get_user_files):
         mock_get_user_file.return_value = self.mock_busi_file_data
         mocked_get_user_files.return_value = self.mock_values
@@ -209,8 +212,8 @@ class FlaskrTestCase(unittest.TestCase):
         self.assertEqual(pro.experience, 2)
         self.assertEqual(pro.speciality, 'patentes')
 
-    @patch('app.get_user_files')
-    @patch('app.get_user_file')
+    @patch('project.app.get_user_files')
+    @patch('project.app.get_user_file')
     def test_list_specialists_for_file(self, mock_get_user_file, mocked_get_user_files):
         mocked_get_user_files.return_value = self.mock_values
         self.login(app.config["USERNAME"], app.config["PASSWORD"])
@@ -248,8 +251,8 @@ class FlaskrTestCase(unittest.TestCase):
         self.assertNotIn(b'andres', rv.data)
         self.assertIn(b'jorge', rv.data)
 
-    @patch('app.get_user_files')
-    @patch('app.get_user_file')
+    @patch('project.app.get_user_files')
+    @patch('project.app.get_user_file')
     def test_assign_specialist_for_file(self, mock_get_user_file, mocked_get_user_files):
         mocked_get_user_files.return_value = self.mock_values
         self.login(app.config["USERNAME"], app.config["PASSWORD"])
@@ -265,7 +268,6 @@ class FlaskrTestCase(unittest.TestCase):
         self.assertIn(b'cusein', rv.data)
         self.assertIn(b'patentes', rv.data)
         self.assertIn(b'en curso', rv.data)
-
 
 if __name__ == "__main__":
     unittest.main()

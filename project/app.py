@@ -38,7 +38,7 @@ app = Flask(__name__)
 app.config.from_object(__name__)
 db = SQLAlchemy(app)
 
-import models
+import project.models as models
 
 STATUS = [
     'patente',
@@ -63,6 +63,7 @@ def login_required(f):
 def index():
     """Searches the database for entries, then displays them."""
     entries = db.session.query(models.Flaskr)
+    print(type(entries))
     return render_template("index.html", entries=entries)
 
 
