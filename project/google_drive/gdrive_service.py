@@ -167,7 +167,7 @@ def main():
 
 
 def get_service():
-    from google_drive.authorization import obtain_creds
+    from project.google_drive import obtain_creds
     return build('drive', 'v3', credentials=obtain_creds())
 
 

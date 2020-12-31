@@ -17,7 +17,7 @@ from flask import (
 )
 from flask_sqlalchemy import SQLAlchemy
 from sqlalchemy import and_, text
-from google_drive.gdrive_service import get_user_files, get_user_file
+from project.google_drive.gdrive_service import get_user_files, get_user_file
 
 # get the folder where this file runs
 basedir = os.path.abspath(os.path.dirname(__file__))
