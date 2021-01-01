@@ -1,4 +1,5 @@
 # imports
+import sqlite3
 import json
 import os
 
@@ -18,18 +19,22 @@ from flask import (
 from flask_sqlalchemy import SQLAlchemy
 from sqlalchemy import and_, text
 from project.google_drive.gdrive_service import get_user_files, get_user_file
+from pathlib import Path
 
 # get the folder where this file runs
 basedir = os.path.abspath(os.path.dirname(__file__))
 
 # configuration
+DATABASE = "flaskr.db"
 SECRET_KEY = "my_precious"
 USERNAME = "admin"
 PASSWORD = "admin"
 
 # database config
+basedir = Path(__file__).resolve().parent
+
 SQLALCHEMY_DATABASE_URI = os.getenv(
-    "DATABASE_URL", f'sqlite:///{os.path.join(basedir, "flaskr.db")}'
+    "DATABASE_URL", f'sqlite:///{Path(basedir).joinpath(DATABASE)}'
 )
 SQLALCHEMY_TRACK_MODIFICATIONS = False
 
@@ -63,7 +68,6 @@ def login_required(f):
 def index():
     """Searches the database for entries, then displays them."""
     entries = db.session.query(models.Flaskr)
-    print(type(entries))
     return render_template("index.html", entries=entries)
 
 
@@ -78,7 +82,6 @@ def files():
 def enter_case(gdrive_id):
     file_info = get_user_file(gdrive_id)
     if request.method == 'POST':
-        print(request.form['name'])
         new_name = f"{request.form['name']}.{file_info['name'].split('.')[1]}" \
             if len(file_info['name'].split('.')) > 1 else file_info['name']
         new_bf = models.BusinessFile(gdrive_id=gdrive_id,
@@ -96,26 +99,42 @@ def enter_case(gdrive_id):
                                  'type': ''})
 
 
-@app.route("/login", methods=["GET", "POST"])
-def login():
-    """User login/authentication/session management."""
-    error = None
+def login_test_user(error):
+    if request.method == 'POST':
+        if request.form['username'] != app.config['USERNAME']:
+            error = 'Nombre de usuario invalida'
+        elif request.form['password'] != app.config['PASSWORD']:
+            error = 'Password invalido'
+        else:
+            session['logged_in'] = True
+            flash('Has iniciado sesión')
+            return redirect(url_for('index'))
+    return error
+
+
+def login_user(error):
     if request.method == "POST":
-        # query = text("SELECT * FROM user where username = '"
-        #              + request.form['username'] + "' AND password = '"
-        #              + request.form['password'] + "'")
         try:
             query_username = db.session.query(models.User).filter_by(username=request.form['username']).all()
-            # result = db.engine.execute(query_username)
-            print(query_username)
             if query_username and query_username[0].password == request.form['password']:
                 session["logged_in"] = True
-                flash("ÉXITO: has iniciado sesión")
+                flash("Has iniciado sesión")
                 return redirect(url_for("index"))
             else:
                 error = "accesos incorrectos"
         except Exception as e:
             error = e
+    return error
+
+
+@app.route("/login", methods=["GET", "POST"])
+def login():
+    """User login/authentication/session management."""
+    error = None
+    if app.config['TESTING']:
+        error = login_test_user(error)
+    else:
+        error = login_user(error)
     return render_template("login.html", error=error)
 
 
